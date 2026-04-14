@@ -29,7 +29,7 @@ module.exports = {
 
         try {
             for (const id of messageIds) {
-                const message = await interaction.channel.messages.fetch(id).catch(() => null);
+                const message = await interaction.channel?.messages.fetch(id).catch(() => null);
 
                 if (!message) {
                     failedCount++;
