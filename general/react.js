@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,9 +14,7 @@ module.exports = {
                 .setRequired(true)),
 
     async execute(interaction) {
-        await interaction.deferReply({
-            flags: MessageFlags.Ephemeral
-        });
+        await interaction.deferReply({ ephemeral: true });
 
         const emoji = interaction.options.getString('emoji');
         const messageIds = interaction.options
@@ -24,10 +22,10 @@ module.exports = {
             .split(',')
             .map(id => id.trim());
 
-        try {
-            let successCount = 0;
-            let failedCount = 0;
+        let successCount = 0;
+        let failedCount = 0;
 
+        try {
             for (const id of messageIds) {
                 const message = await interaction.channel.messages.fetch(id).catch(() => null);
 
@@ -45,7 +43,7 @@ module.exports = {
             }
 
             return interaction.editReply({
-                content: `✅ **reacted: ${successCount}\n❌ failed: ${failedCount}**`
+                content: `✅ reacted: ${successCount}\n❌ failed: ${failedCount}`
             });
 
         } catch (error) {
