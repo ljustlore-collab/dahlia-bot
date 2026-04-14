@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,15 +11,12 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        await interaction.deferReply({
-            flags: MessageFlags.Ephemeral
-        });
+        await interaction.deferReply({ ephemeral: true });
 
         const messageId = interaction.options.getString('message_id');
 
         try {
-            const message = await interaction.channel.messages.fetch(messageId)
-                .catch(() => null);
+            const message = await interaction.channel.messages.fetch(messageId).catch(() => null);
 
             if (!message) {
                 return interaction.editReply({
