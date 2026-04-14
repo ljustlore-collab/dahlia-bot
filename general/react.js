@@ -45,7 +45,7 @@ module.exports = {
             }
 
             return interaction.editReply({
-                content: `✅ **reacted: ${successCount}.\n❌ failed: ${failedCount}.**`
+                content: `✅ **reacted: ${successCount}\n❌ failed: ${failedCount}**`
             });
 
         } catch (error) {
