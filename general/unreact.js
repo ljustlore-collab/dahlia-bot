@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,30 +11,39 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true });
-
         const messageId = interaction.options.getString('message_id');
 
         try {
-            const message = await interaction.channel.messages.fetch(messageId).catch(() => null);
+            await interaction.deferReply({
+                flags: MessageFlags.Ephemeral
+            });
+
+            const message = await interaction.channel?.messages.fetch(messageId).catch(() => null);
 
             if (!message) {
-                return interaction.editReply({
-                    content: '❓ **i cannot find that message.**'
+                return await interaction.editReply({
+                    content: '❓ cannot find that message.'
                 });
             }
 
             await message.reactions.removeAll();
 
-            return interaction.editReply({
-                content: '✅ **all reactions have been removed successfully.**'
+            return await interaction.editReply({
+                content: '✅ all reactions removed successfully.'
             });
 
         } catch (error) {
             console.error(error);
 
-            return interaction.editReply({
-                content: `❌ **error: ${error.message}.**`
+            if (interaction.deferred || interaction.replied) {
+                return interaction.editReply({
+                    content: `❌ error: ${error.message}`
+                });
+            }
+
+            return interaction.reply({
+                content: `❌ error: ${error.message}`,
+                flags: MessageFlags.Ephemeral
             });
         }
     }
