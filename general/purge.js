@@ -15,7 +15,6 @@ module.exports = {
         const amount = interaction.options.getInteger('amount');
         const channel = interaction.channel;
 
-        // ❌ Permission check (correct way)
         if (!channel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.ManageMessages)) {
             return interaction.reply({
                 content: '❌ **I do not have permission to manage messages in this channel.**',
@@ -28,9 +27,6 @@ module.exports = {
         });
 
         try {
-            // =========================
-            // PURGE LIMITED AMOUNT
-            // =========================
             if (amount) {
                 const messages = await channel.messages.fetch({ limit: amount });
 
@@ -40,9 +36,7 @@ module.exports = {
                     try {
                         await msg.delete();
                         deletedCount++;
-                    } catch (err) {
-                        // ignore individual failures
-                    }
+                    } catch (err) {}
                 }
 
                 return interaction.editReply({
@@ -50,9 +44,6 @@ module.exports = {
                 });
             }
 
-            // =========================
-            // PURGE ALL (100-BATCH LOOP)
-            // =========================
             let totalDeleted = 0;
 
             while (true) {
@@ -63,9 +54,7 @@ module.exports = {
                     try {
                         await msg.delete();
                         totalDeleted++;
-                    } catch (err) {
-                        // ignore
-                    }
+                    } catch (err) {}
                 }
             }
 
