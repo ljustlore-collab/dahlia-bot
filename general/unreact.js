@@ -37,7 +37,6 @@ module.exports = {
             try {
                 const message = await channel.messages.fetch(messageId);
 
-                // Ensure full message data before removing reactions
                 await message.fetch();
                 await message.reactions.removeAll();
 
