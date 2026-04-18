@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const fs = require('fs');
 const path = require('path');
+const express = require("express"); // ✅ added
 const { Client, Collection, GatewayIntentBits, MessageFlags } = require('discord.js');
 
 const client = new Client({
@@ -11,6 +12,22 @@ const client = new Client({
         GatewayIntentBits.MessageContent
     ]
 });
+
+// ========================
+// EXPRESS SERVER (RENDER FIX)
+// ========================
+const app = express();
+
+app.get("/", (req, res) => {
+    res.send("Bot is alive");
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🌐 Web server running on port ${PORT}`);
+});
+
+// ========================
 
 client.commands = new Collection();
 
