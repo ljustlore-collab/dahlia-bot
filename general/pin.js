@@ -13,7 +13,6 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
     async execute(interaction) {
-        // ✅ Correct defer (modern + ephemeral)
         await interaction.deferReply({
             flags: MessageFlags.Ephemeral
         });
@@ -44,7 +43,6 @@ module.exports = {
                 }
             }
 
-            // ✅ Use editReply AFTER defer
             await interaction.editReply({
                 content: `✅ **successfully pinned ${successCount} message(s).**`
             });
