@@ -11,7 +11,8 @@ module.exports = {
         .addStringOption(option =>
             option.setName('message_ids')
                 .setDescription('Message IDs separated by spaces or commas')
-                .setRequired(true)),
+                .setRequired(true)
+        ),
 
     async execute(interaction) {
         await interaction.deferReply({
@@ -38,10 +39,8 @@ module.exports = {
         for (const id of messageIds) {
             try {
                 const message = await interaction.channel.messages.fetch(id);
-
                 await message.react(emoji);
                 successCount++;
-
             } catch (err) {
                 console.error(`Failed on ${id}:`, err.message);
                 failedCount++;
