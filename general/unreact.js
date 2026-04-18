@@ -3,48 +3,53 @@ const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('unreact')
-        .setDescription('removes all emojis from a message.')
+        .setDescription('Removes all reactions from multiple messages.')
         .addStringOption(option =>
-            option.setName('message_id')
-                .setDescription('the id of the message')
+            option.setName('message_ids')
+                .setDescription('Message IDs separated by spaces or commas')
                 .setRequired(true)
         ),
 
     async execute(interaction) {
-        const messageId = interaction.options.getString('message_id');
+        await interaction.deferReply({
+            flags: MessageFlags.Ephemeral
+        });
 
-        try {
-            await interaction.deferReply({
-                flags: MessageFlags.Ephemeral
-            });
-
-            const message = await interaction.channel?.messages.fetch(messageId).catch(() => null);
-
-            if (!message) {
-                return await interaction.editReply({
-                    content: '❓ cannot find that message.'
-                });
-            }
-
-            await message.reactions.removeAll();
-
-            return await interaction.editReply({
-                content: '✅ all reactions removed successfully.'
-            });
-
-        } catch (error) {
-            console.error(error);
-
-            if (interaction.deferred || interaction.replied) {
-                return interaction.editReply({
-                    content: `❌ error: ${error.message}`
-                });
-            }
-
-            return interaction.reply({
-                content: `❌ error: ${error.message}`,
-                flags: MessageFlags.Ephemeral
+        if (!interaction.inGuild() || !interaction.channel?.isTextBased()) {
+            return interaction.editReply({
+                content: '❌ Must be used in a server text channel.'
             });
         }
+
+        const input = interaction.options.getString('message_ids');
+
+        const messageIds = input
+            .split(/[\s,]+/)
+            .map(id => id.trim())
+            .filter(Boolean);
+
+        const channel = interaction.channel;
+
+        let success = 0;
+        let failed = 0;
+
+        for (const messageId of messageIds) {
+            try {
+                const message = await channel.messages.fetch(messageId);
+
+                // Ensure full message data before removing reactions
+                await message.fetch();
+                await message.reactions.removeAll();
+
+                success++;
+            } catch (err) {
+                console.error(`Failed on ${messageId}:`, err.message);
+                failed++;
+            }
+        }
+
+        return interaction.editReply({
+            content: `✅ Done\n✔ Cleared: ${success}\n❌ Failed: ${failed}`
+        });
     }
 };
